@@ -1,13 +1,13 @@
-package com.zeroonedance.javaadminserver;
+package com.zeroonedance.adminapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class JavaAdminServerApplication {
+public class JavaAdminApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(JavaAdminServerApplication.class, args);
+        SpringApplication.run(JavaAdminApiApplication.class, args);
     }
 
 }
