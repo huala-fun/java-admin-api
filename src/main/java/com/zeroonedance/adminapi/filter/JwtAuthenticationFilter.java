@@ -1,8 +1,12 @@
 package com.zeroonedance.adminapi.filter;
 
+import com.zeroonedance.adminapi.service.UserService;
 import com.zeroonedance.adminapi.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -18,7 +22,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JWTUtil jwtService;
+    private final JWTUtil jwtUtil;
+
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -29,10 +35,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwtFlag = "Bearer ";
         final String jwtToken;
+        final String userName;
         if (Objects.isNull(authHeader) || !authHeader.startsWith(jwtFlag)) {
             filterChain.doFilter(request, response);
-            return ;
+            return;
         }
         jwtToken = authHeader.substring(jwtFlag.length());
+        userName = jwtUtil.extractUserName(jwtToken);
+        if (Objects.nonNull(userName) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
+        }
     }
 }
