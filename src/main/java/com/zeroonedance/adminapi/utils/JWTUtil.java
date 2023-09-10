@@ -9,7 +9,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-@CommonsLog
+@Component
 public class JWTUtil {
 
     private static final String SECRET_KEY = "YrxPyhEzfgSUCjHCFdJofKxlNacBslWH";

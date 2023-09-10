@@ -4,9 +4,13 @@ import com.zeroonedance.adminapi.service.UserService;
 import com.zeroonedance.adminapi.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -42,8 +46,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         jwtToken = authHeader.substring(jwtFlag.length());
         userName = jwtUtil.extractUserName(jwtToken);
-        if (Objects.nonNull(userName) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        if (Objects.nonNull(userName) && Objects.isNull(securityContext.getAuthentication())) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
+            if(jwtUtil.isTokenValid(jwtToken, userDetails)){
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                securityContext.setAuthentication(authToken);
+            }
         }
+        filterChain.doFilter(request, response);
     }
 }
