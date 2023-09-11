@@ -1,19 +1,19 @@
-package com.zeroonedance.adminapi.controller.auth;
+package com.zeroonedance.adminapi.auth;
 
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AuthenticationController {
 
-
     private final AuthenticationService authenticationService;
-
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
@@ -27,4 +27,5 @@ public class AuthenticationController {
             @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
+
 }

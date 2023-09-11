@@ -1,15 +1,15 @@
-package com.zeroonedance.adminapi.filter;
+package com.zeroonedance.adminapi.config;
 
-import com.zeroonedance.adminapi.service.UserService;
 import com.zeroonedance.adminapi.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -22,8 +22,9 @@ import java.io.IOException;
 import java.util.Objects;
 
 
+@Slf4j
 @Component
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
@@ -38,23 +39,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwtFlag = "Bearer ";
-        final String jwtToken;
-        final String userName;
         if (Objects.isNull(authHeader) || !authHeader.startsWith(jwtFlag)) {
+            log.warn("JWT Token does not begin with Bearer String");
             filterChain.doFilter(request, response);
             return;
         }
-        jwtToken = authHeader.substring(jwtFlag.length());
-        userName = jwtUtil.extractUserName(jwtToken);
+        final String jwtToken = authHeader.substring(jwtFlag.length());
+        final String userName = jwtUtil.extractUserName(jwtToken);
         SecurityContext securityContext = SecurityContextHolder.getContext();
         if (Objects.nonNull(userName) && Objects.isNull(securityContext.getAuthentication())) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
-            if(jwtUtil.isTokenValid(jwtToken, userDetails)){
+            if (userDetails == null) {
+                log.warn("User not found");
+                filterChain.doFilter(request, response);
+                return;
+            }
+            if (jwtUtil.isTokenValid(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 securityContext.setAuthentication(authToken);
+            } else {
+                log.warn("JWT Token is not valid");
             }
         }
         filterChain.doFilter(request, response);

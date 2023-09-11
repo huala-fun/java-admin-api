@@ -1,4 +1,4 @@
-package com.zeroonedance.adminapi.controller.auth;
+package com.zeroonedance.adminapi.auth;
 
 
 import lombok.AllArgsConstructor;

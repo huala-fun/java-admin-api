@@ -1,18 +1,19 @@
-package com.zeroonedance.adminapi.controller.auth;
+package com.zeroonedance.adminapi.auth;
 
 
-import com.zeroonedance.adminapi.model.Role;
-import com.zeroonedance.adminapi.model.User;
-import com.zeroonedance.adminapi.repository.UserRepository;
+import com.zeroonedance.adminapi.user.Role;
+import com.zeroonedance.adminapi.user.User;
+import com.zeroonedance.adminapi.user.UserRepository;
 import com.zeroonedance.adminapi.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AuthenticationService {
 
     private final UserRepository userRepository;
@@ -40,7 +41,7 @@ public class AuthenticationService {
                 request.getAccount(),
                 request.getPassword()
         ));
-        User user = userRepository.findByAccount(request.getAccount())
+        User user = userRepository.findUserByUsername(request.getAccount())
                 .orElseThrow();
         String jwtToken = jwtUtil.generateToken(user);
         return AuthenticationResponse.builder().token(jwtToken).build();

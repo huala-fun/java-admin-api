@@ -1,20 +1,17 @@
 package com.zeroonedance.adminapi.utils;
 
 
-import com.zeroonedance.adminapi.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -35,8 +32,7 @@ public class JWTUtil {
                 .setClaims(extractClaim)
                 .setIssuedAt(new Date(signTime))
                 .setExpiration(new Date(expirationTime))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .toString();
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){
@@ -69,9 +65,7 @@ public class JWTUtil {
 
 
     private javax.crypto.SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
-
 
 }

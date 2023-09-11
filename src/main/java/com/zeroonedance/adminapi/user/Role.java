@@ -1,4 +1,4 @@
-package com.zeroonedance.adminapi.model;
+package com.zeroonedance.adminapi.user;
 
 /**
  *

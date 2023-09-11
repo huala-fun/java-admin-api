@@ -1,4 +1,4 @@
-package com.zeroonedance.adminapi.controller.auth;
+package com.zeroonedance.adminapi.auth;
 
 
 import lombok.AllArgsConstructor;
@@ -10,12 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class AuthenticationResponse {
 
-    private String account;
-
-    private String email;
-
-    private String password;
-
+    private String token;
 }
