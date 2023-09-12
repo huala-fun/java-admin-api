@@ -1,6 +1,7 @@
 package com.zeroonedance.adminapi.config;
 
 import com.zeroonedance.adminapi.utils.JWTUtil;
+import com.zeroonedance.adminapi.utils.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
 
+    private final RedisUtil redisUtil;
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -47,6 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwtToken = authHeader.substring(jwtFlag.length());
         final String userName = jwtUtil.extractUserName(jwtToken);
         SecurityContext securityContext = SecurityContextHolder.getContext();
+        redisUtil.set("he.wenyao", "dddd");
         if (Objects.nonNull(userName) && Objects.isNull(securityContext.getAuthentication())) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
             if (userDetails == null) {

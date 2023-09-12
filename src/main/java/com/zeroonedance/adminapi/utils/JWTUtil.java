@@ -32,7 +32,7 @@ public class JWTUtil {
                 .setClaims(extractClaim)
                 .setIssuedAt(new Date(signTime))
                 .setExpiration(new Date(expirationTime))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
+                .signWith(getSignInKey()).compact();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){
@@ -65,7 +65,7 @@ public class JWTUtil {
 
 
     private javax.crypto.SecretKey getSignInKey() {
-        return Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
 }

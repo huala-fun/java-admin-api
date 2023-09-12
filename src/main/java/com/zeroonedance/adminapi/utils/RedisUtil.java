@@ -77,6 +77,7 @@ public class RedisUtil {
      */
     public void set(String key, String value) {
         // 使用 redisTemplate 将值设置到缓存中
+
         redisTemplate.opsForValue().set(key, value);
     }
 
