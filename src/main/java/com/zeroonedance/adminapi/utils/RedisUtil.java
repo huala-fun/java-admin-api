@@ -56,6 +56,16 @@ public class RedisUtil {
         return Boolean.TRUE.equals(redisTemplate.boundValueOps(key).persist());
     }
 
+
+
+
+
+    public void setObject(String key, Object value){
+        redisTemplate.opsForValue().set(key, value);
+    }
+
+
+
     //- - - - - - - - - - - - - - - - - - - - -  String类型 - - - - - - - - - - - - - - - - - - - -
 
     /**

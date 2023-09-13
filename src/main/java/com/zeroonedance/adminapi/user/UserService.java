@@ -18,9 +18,10 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     /**
-     * 加载指定用户名的用户。
+     * 加载指定用户名（唯一标识）的用户。
      *
-     * @param username 要加载的用户的用户名
+     *
+     * @param username 要加载的用户的用户名（ 唯一标识）
      * @return 如果找到用户详情，则返回用户详情，否则抛出UsernameNotFoundException异常
      */
     @Override
