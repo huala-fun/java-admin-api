@@ -35,15 +35,15 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequest request) {
         User user = User.builder()
+                .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
         userRepository.save(user);
-        String jwtToken = jwtUtil.generateToken(user);
+        String jwtToken = jwtUtil.generateToken(user.getUsername());
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
-
 
 
     public AuthenticationResponse login(AuthenticationRequest request) {
@@ -56,8 +56,8 @@ public class AuthenticationService {
             throw new RuntimeException("登录失败");
         }
         User user = (User) authenticate.getPrincipal();
-        String jwtToken = jwtUtil.generateToken(user);
-        redisUtil.setObject("user:"+user.getId(), user);
+        String jwtToken = jwtUtil.generateToken(user.getUsername());
+        redisUtil.setObject("user:" + user.getId(), user);
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 }

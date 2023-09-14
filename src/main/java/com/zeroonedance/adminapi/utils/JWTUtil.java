@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -17,27 +18,51 @@ import java.util.function.Function;
 @Component
 public class JWTUtil {
 
+    @Value("${jwt.secret}")
     private static final String SECRET_KEY = "YrxPyhEzfgSUCjHCFdJofKxlNacBslWH";
 
-
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(userDetails, new HashMap<>());
+    /**
+     * 为给定的用户详细信息和声明映射生成令牌。
+     *
+     * @param uniqueIdentifier 用户唯一标识
+     * @return 生成的令牌
+     */
+    public String generateToken(String uniqueIdentifier) {
+        return generateToken(uniqueIdentifier, new HashMap<>());
     }
 
-    public String generateToken(UserDetails userDetails, Map<String, Object> extractClaim) {
+    /**
+     * 为给定的用户详细信息和声明映射生成令牌。
+     * <br/>
+     * extractClaim 中存在 sub 、iat 等标准声明的话，会覆盖方法内标准声明
+     * <br/>
+     * {sub:11} 中的 11 会替换掉 uniqueIdentifier
+     *
+     * @param uniqueIdentifier 用户唯一标识
+     * @param extractClaim     自定义声明（扩展声明）
+     * @return 生成的令牌
+     */
+    public String generateToken(String uniqueIdentifier, Map<String, Object> extractClaim) {
         final long signTime = System.currentTimeMillis();
         final long expirationTime = signTime + 1000 * 60 * 24;
-        return Jwts.builder().setClaims(extractClaim)
-                .setSubject(userDetails.getUsername())
-                .setClaims(extractClaim)
-                .setIssuedAt(new Date(signTime))
-                .setExpiration(new Date(expirationTime))
+        return Jwts.builder()
+                .setIssuer("admin-api") // 颁发者为 admin-api
+                .setSubject(uniqueIdentifier) // 存放用户唯一标识
+                .setIssuedAt(new Date(signTime)) // 存放签发时间
+                .setExpiration(new Date(expirationTime))  // 存放过期时间
+                .addClaims(extractClaim)            // 追加声明（扩展声明）
                 .signWith(getSignInKey()).compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails){
+
+    /**
+     * @param token
+     * @param userDetails
+     * @return
+     */
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         final String userName = extractUserName(token);
-        return (userName.equals( userDetails.getUsername()) && isTokenExpired(token));
+        return (userName.equals(userDetails.getUsername()) && isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {
