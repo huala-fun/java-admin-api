@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +26,8 @@ public class User implements UserDetails {
     @GeneratedValue
     private Integer id;
 
+    @Column(unique = true)
+    @Comment("用户名（唯一）")
     private String username;
 
     private String password;
